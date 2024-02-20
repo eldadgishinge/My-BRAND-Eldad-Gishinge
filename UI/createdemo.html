@@ -10,7 +10,7 @@
     <title>Eldad Gishinge</title>
   <link rel="icon" href="image/eldad.JPG" type="image" />
 
-    <script defer src="script.js"></script>
+
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css" />
 
@@ -69,7 +69,8 @@
     </header>
     <main>
       <div class="create">
-        <form id="blog-form" action="Index3.html">
+        <form autocomplete="off" id="blog-form" onsubmit="onFormSubmit()">
+
           <div class="blog-all">
             <div class="blog-all1">
               <!-- <label for="fruit">Choose your blog</label>
@@ -80,7 +81,8 @@
                 <option value="grape">Create new blog</option>
               </select> -->
               <label for="link">Name of blog: </label>
-              <input type="text" name="link" id="blog_name" />
+              <input type="text" name="name" id="blog_name" />
+              <div id="name_error" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
 
               <div class="form-group2">
                 <label for="message">Message:</label>
@@ -89,13 +91,15 @@
                   name="message"
                   rows="4"
                   cols="50"
-                  required
-                ></textarea>
+
+                ></textarea><div id="message_error" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
               </div>
               <label for="link">link to learn more:</label>
               <input type="text" name="link" id="link_more" />
+              <div id="link1" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
               <label for="link">link of Thumnail:</label>
               <input type="text" name="link" id="link_image" />
+              <div id="link2" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
             </div>
             <div class="blog-all2">
               <img src="image/young man working at desk.png" alt="finalimgae" />
@@ -104,39 +108,30 @@
                 value="Create or Change"
                 id="create-submit"
               />
+              <input type="reset" value="reset" id="create-submit">
             </div>
           </div>
         </form>
+        <td>
+          <table class="list" id="storeList">
+  <thead>
+    <tr>
+      <th>Name of blog</th>
+      <th>Message</th>
+      <th>link to learn more</th>
+      <th>link of Thumnail</th>
+    </tr>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+        </td>
+
+
+
       </div>
     </main>
-    <script>
-      const toggle_Btn = document.querySelector(".toggle_btn");
-      const toggle_BtnIcon = document.querySelector(".toggle_btn i");
-      const dropdown_menu = document.querySelector(".dropdown_menu");
-
-      toggle_Btn.onclick = function () {
-        dropdown_menu.classList.toggle("open");
-        const isOpen = dropdown_menu.classList.contains("open");
-        toggle_BtnIcon.className = isOpen ? "fas fa-xmark" : "fas fa-bars";
-      };
-
-      function myfunc(event) {
-        event.preventDefault();
-
-        var blog_name = document.getElementById("blog_name").value;
-        var message = document.getElementById("message").value;
-        var link_more = document.getElementById("link_more").value;
-        var link_image = document.getElementById("link_image").value;
-
-        localStorage.setItem('ls_full_name', blog_name);
-        localStorage.setItem('ls_message',message);
-        localStorage.setItem('ls_link_more', link_more);
-        localStorage.setItem('ls_link_image', link_image);
-
-      }
-      document.getElementById("blog-form").addEventListener("submit", myfunc);
-
-
-    </script>
+ <script  src="script2.js"></script>
   </body>
 </html>

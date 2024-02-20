@@ -71,14 +71,18 @@
       <div class="contat-me-all">
         <div class="first-div">
           <h1 style="color: white"><u>Contact us</u></h1>
-          <form class="contact-form">
+          <form action="https://formsubmit.co/e.gishinge@alustudent.com" method="POST" class="contact-form">
             <div class="form-group">
               <label for="name">Name:</label>
-              <input type="text" id="name" name="name" required />
+              <input type="text" id="name" name="name"  />
+              <div id="error_name" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
+
             </div>
             <div class="form-group">
               <label for="email">Email:</label>
-              <input type="email" id="email" name="email" required />
+              <input type="email" id="email" name="email"  />
+              <div id="error_mail" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
+
             </div>
             <div class="form-group">
               <label for="message">Message:</label>
@@ -87,8 +91,10 @@
                 name="message"
                 rows="4"
                 cols="50"
-                required
+
               ></textarea>
+              <div id="error_message" style="color: red; font-size:small; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;"></div>
+
             </div>
             <input
               class="submit-btn"
@@ -134,15 +140,74 @@
     </footer>
       <script>
 
-      const toggle_Btn = document.querySelector('.toggle_btn')
-      const toggle_BtnIcon = document.querySelector('.toggle_btn i')
-      const dropdown_menu = document.querySelector('.dropdown_menu')
+   const toggle_Btn = document.querySelector('.toggle_btn')
+const toggle_BtnIcon = document.querySelector('.toggle_btn i')
+const dropdown_menu = document.querySelector('.dropdown_menu')
 
-      toggle_Btn.onclick =function(){
-        dropdown_menu.classList.toggle('open')
-        const isOpen = dropdown_menu.classList.contains('open')
-        toggle_BtnIcon.className = isOpen ? 'fas fa-xmark' : 'fas fa-bars';
-      }
+toggle_Btn.onclick = function () {
+    dropdown_menu.classList.toggle('open')
+    const isOpen = dropdown_menu.classList.contains('open')
+    toggle_BtnIcon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+}
+
+function myfunc(event) {
+    event.preventDefault();
+
+    var person_name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var message = document.getElementById("message").value;
+
+    localStorage.setItem('ls_full_name', person_name);
+    localStorage.setItem('ls_email', email);
+    localStorage.setItem('ls_message', message);
+
+    // After storing data in local storage, submit the form
+    document.querySelector(".contact-form").submit();
+}
+
+document.querySelector(".contact-form").addEventListener("submit", function (e) {
+    // Prevent form submission
+    e.preventDefault();
+
+    let name = document.getElementById("name").value;
+    let email = document.getElementById("email").value;
+    let message = document.getElementById("message").value;
+    let error_name = document.getElementById("error_name");
+    let error_mail = document.getElementById("error_mail");
+    let error_message = document.getElementById("error_message");
+
+    let message_name = [];
+    let message_mail = [];
+    let message_message = [];
+
+    if (name === "" || name == null) {
+        message_name.push("Name is required");
+        error_name.innerHTML = message_name.join('<br>');
+    } else {
+        error_name.innerHTML = ""; // Clear error messages
+    }
+
+    if (email === "" || email == null || !email.includes('@') || !email.includes('.')) {
+        message_mail.push("Please provide a valid email address");
+        error_mail.innerHTML = message_mail.join('<br>');
+    } else {
+        error_mail.innerHTML = ""; // Clear error messages
+    }
+
+    if (message === "" || message == null) {
+        message_message.push("Message is required");
+        error_message.innerHTML = message_message.join('<br>');
+    } else {
+        error_message.innerHTML = ""; // Clear error messages
+    }
+
+    // If there are no errors, you can submit the form
+    if (message_name.length === 0 && message_mail.length === 0 && message_message.length === 0) {
+        myfunc(e); // Store data in local storage
+        // You can choose to submit the form here
+        // document.querySelector(".contact-form").submit();
+    }
+});
 
     </script>
   </body>

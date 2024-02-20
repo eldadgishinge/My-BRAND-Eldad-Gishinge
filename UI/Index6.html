@@ -10,7 +10,7 @@
     <title>Eldad Gishinge</title>
     <link rel="icon" href="image/eldad.JPG" type="image" />
 
-
+<script src="script.js"></script>
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css" />
 
@@ -81,7 +81,7 @@
             The impact of the Internet of Things (IoT) in Africa is multifaceted
             and holds significant potential to address various social, economic,
             and developmental challenges while also fostering innovation and
-            sustainability.<div class="reaction"> <img src="image/Facebook Like.png" alt="like"> 2<img src="image/Chat Bubble.png" alt="like">3</div>
+            sustainability.<div class="reaction"><button onclick="Toggle1()" id="btn1" class="btn"><i class="fa-solid fa-thumbs-up" style="color: #ffa500;"></i><span id="fs_count">0</span></button>  <i class="fa-solid fa-comment-dots" style="color: #ffa500;"></i> <span style="color: white;">2</span></div>
           </p>
           <div class="comment">
             <div
@@ -90,24 +90,24 @@
             >
               <form
                 class="comment-form"
-                action="#"
                 method="post"
                 enctype="multipart/form-data"
               >
                 <h3 style="color: orange"><b>Comment</b></h3>
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required />
+                <input type="text" id="name" name="name"  />
+                <div id="error1" style="color: red; font-size:small;"></div>
 
                 <label for="comment">Comment:</label>
                 <textarea
                   id="comment"
                   name="comment"
                   rows="4"
-                  required
-                ></textarea>
 
-                <label for="image">Upload Image:</label>
-                <input type="file" id="image" name="image" />
+                ></textarea><div id="error" style="color: red; font-size:small;"></div>
+
+                <!-- <label for="image">Upload Image:</label>
+                <input type="file" id="image" name="image" /> -->
 
                 <br />
                 <input type="submit" value="Submit" s />
@@ -116,8 +116,8 @@
             <div class="comment-display">
               <div class="comment21">
                 <h4>
-                  <img src="image/Ellipse 1.jpg" alt="" /><strong
-                    >Marie claire</strong
+                  <!-- <img src="image/Ellipse 1.jpg" alt="" /> -->
+                  <strong>Marie claire</strong
                   >
                   15.02.2024
                 </h4>
@@ -125,7 +125,8 @@
               </div>
               <div class="comment21">
                 <h4>
-                  <img src="image/Ellipse 2.jpg" alt="" /><strong
+                  <!-- <img src="image/Ellipse 2.jpg" alt="" /> -->
+                  <strong
                     >Ben Cyiza</strong
                   >
                   10.02.2024
@@ -195,6 +196,81 @@
         const isOpen = dropdown_menu.classList.contains("open");
         toggle_BtnIcon.className = isOpen ? "fas fa-xmark" : "fas fa-bars";
       };
+
+   const form = document.querySelector(".comment-form"); // Select the form element
+  const name = document.getElementById("name");
+  const comment = document.getElementById("comment");
+  const error1 = document.getElementById("error1");
+  const error = document.getElementById("error");
+
+  form.addEventListener("submit", (e) => {
+    let message1 = [];
+    let messages = [];
+    if (name.value === "" || name.value == null) {
+      message1.push("Name is required");
+      error1.innerHTML = message1.join(', '); // Display all error messages
+      e.preventDefault(); // Prevent form submission if there are errors
+    }
+    if (comment.value === "" || comment.value == null) {
+      messages.push("Comment is required"); // Fix typo here
+      error.innerHTML = messages.join(', '); // Display all error messages
+      e.preventDefault(); // Prevent form submission if there are errors
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.comment-form');
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get user input
+    const name = document.getElementById('name').value;
+    const comment = document.getElementById('comment').value;
+    const error1 = document.getElementById('error1');
+    const error = document.getElementById('error');
+
+    let message1 = [];
+    let messages = [];
+
+    if (name === '' || name === null) {
+      message1.push('Name is required');
+    }
+
+    if (comment === '' || comment === null) {
+      messages.push('Comment is required');
+    }
+
+    // Display validation errors if any
+    error1.innerHTML = message1.join(', ');
+    error.innerHTML = messages.join(', ');
+
+    // If there are no validation errors, add the comment
+    if (message1.length === 0 && messages.length === 0) {
+      // Create HTML elements for the new comment
+      const newComment = document.createElement('div');
+      newComment.classList.add('comment21');
+
+      const commentContent = `
+        <h4><strong>${name}</strong> ${new Date().toLocaleDateString()}</h4>
+        <p>${comment}</p>
+      `;
+
+      newComment.innerHTML = commentContent;
+
+      // Insert the new comment into the comment display
+      const commentDisplay = document.querySelector('.comment-display');
+      commentDisplay.appendChild(newComment);
+
+      // Clear the form fields
+      document.getElementById('name').value = '';
+      document.getElementById('comment').value = '';
+    }
+  });
+});
+
+
     </script>
+
   </body>
 </html>

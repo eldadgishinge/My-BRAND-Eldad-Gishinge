@@ -68,9 +68,9 @@
     <main>
       <div class="main-sign">
         <div class="sign-in-div">
-          <h1>Sign in</h1>
+          <h1>Sign UP</h1>
           <!-- <div id="error"></div> -->
-          <form action="index.html" id= "form"  method="GET">
+          <form action="index8.html" id= "form"  method="GET">
             <label for="name">Name:</label>
             <input
               type="text"
@@ -88,29 +88,27 @@
               placeholder="Enter your password"
             /><div id="error" style="color: red; font-size:small;"></div>
 
-            <button type="submit" >Sign in</button>
+            <label for="password">Password:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Rewrite your password"
+            /><div id="error" style="color: red; font-size:small;"></div>
+
+            <button type="submit">Sign in</button>
 
             <div class="g-sign-in">
-              <button id="google-login-btn">
+              <button href="#">
                 <img src="image/google.png" alt="Google logo" />
                 <p style="color: white">SIGN IN WITH GOOGLE</p>
               </button>
             </div>
-            <div class="sign-add">
-              <ul class="acc">
-                <li>
-                  <a href="create_user.html">Create an accout</a>
-                </li>
-                <li>
-                  <a href="createdemo.html">Admin</a>
-                </li>
-              </ul>
-            </div>
+
           </form>
         </div>
       </div>
     </main>
-
      <script>
 
       const toggle_Btn = document.querySelector('.toggle_btn')
@@ -133,47 +131,28 @@ const errorElement = document.getElementById("error");
 const error1Element = document.getElementById("error1");
 
 form.addEventListener("submit", (e) => {
-  e.preventDefault(); // Prevent form submission for now
-
   let messages = [];
-  let message1 = [];
-
+  let message1 =[];
   if (name.value === "" || name.value == null) {
     message1.push("Name is required");
     error1Element.innerHTML = message1;
-  }
 
-  if (password.value.length <= 6) {
-    messages.push("Password must be longer than 6 characters");
-  }
+  } if (password.value.length <= 6)
+  { messages.push("Password must be longer than 6 characters");
+  errorElement.innerText = messages; }
+  if (password.value.length >= 20)
+  { messages.push("Password must be less than 20 characters");
 
-  if (password.value.length >= 20) {
-    messages.push("Password must be less than 20 characters");
-  }
-
-  if (password.value === "password") {
-    messages.push("Password cannot be 'password'");
-  }
-
-  if (messages.length > 0 || message1.length > 0) {
-    errorElement.innerText = messages.join(", ");
-    error1Element.innerText = message1.join(", ");
-  } else {
-    // Check if the entered name is "Admin" and redirect accordingly
-    if (name.value === "Admin") {
-      window.location.href = "createdemo.html";
-    } else {
-      window.location.href = "index.html";
-    }
-
-    // Store the name and password in localStorage after redirection
-    localStorage.setItem("username", name.value);
-    localStorage.setItem("password", password.value);
-  }
-});
-
-
-
+  errorElement.innerText = messages;
+}
+if (password.value === "password") {
+  messages.push("Password cannot be password");
+  errorElement.innerText = messages;
+}
+if (messages.length > 0) {
+  e.preventDefault();
+  errorElement.innerText = messages.join(", ");
+} });
     </script>
   </body>
 </html>
