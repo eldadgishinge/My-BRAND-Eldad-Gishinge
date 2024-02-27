@@ -18,7 +18,7 @@
 
   </head>
 
-  <body>
+  <body onload="readAll()">
     <header>
       <div class="navbar">
         <ul class="main_buttons">
@@ -67,9 +67,11 @@
       </nav>
 
     </header>
+
     <main>
+
       <div class="create">
-        <form autocomplete="off" id="blog-form" ">
+        <form autocomplete="off" id="blog-form">
 
           <div class="blog-all">
             <div class="blog-all1">
@@ -107,6 +109,7 @@
                 type="submit"
                 value="Create or Change"
                 id="create-submit"
+                onclick="AddData()"
               />
               <input type="reset" value="reset" id="create-submit">
             </div>
@@ -122,7 +125,7 @@
       <th>link of Thumnail</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="data_table">
 
   </tbody>
 </table>
@@ -132,6 +135,22 @@
 
       </div>
     </main>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "admin.html";
+    }
+  });
+
+  document.getElementById("sign-in").addEventListener("click", function () {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "admin.html";
+  });
+</script>
+
+
  <script  src="script2.js"></script>
   </body>
 </html>

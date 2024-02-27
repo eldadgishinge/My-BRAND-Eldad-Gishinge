@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Like Counter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #likes {
+        font-size: 24px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Welcome to the Like Counter</h2>
+    <div id="loginForm">
+      <input type="text" id="username" placeholder="Enter username" />
+      <button onclick="login()">Login</button>
+    </div>
+    <div id="likeButton" style="display: none">
+      <button onclick="like()">Like!</button>
+      <p>Likes: <span id="likes">0</span></p>
+    </div>
+
+    <script>
+      function login() {
+        const userinfo = document.querySelector("#username");
+        const loginForm = document.getElementById("loginForm");
+        const likes = document.getElementById("likes");
+
+        localStorage.setItem("likes", likes.innerHTML);
+        localStorage.setItem("userinfo", userinfo.value);
+        loginForm.style.display = "none";
+        document.getElementById("likeButton").style.display = "block";
+      }
+
+      var arrlikes = [];
+      function like() {
+        const likes = document.getElementById("likes");
+        var userinfo = localStorage.getItem("userinfo");
+        var like = localStorage.getItem("likes");
+        arrlikes.push(like);
+        localStorage.setItem("arrlikes", arrlikes);
+        console.log(arrlikes.length);
+        likes.innerHTML = arrlikes.length;
+      }
+    </script>
+  </body>
+</html>

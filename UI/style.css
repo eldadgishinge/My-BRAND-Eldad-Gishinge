@@ -2,6 +2,7 @@ body {
   height: 100vh;
   width: 100%;
   background-image: linear-gradient(black, grey, grey, black);
+  /* background-image: linear-gradient(green, green); */
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
@@ -411,6 +412,7 @@ h4 {
   margin-right: 0px;
 }
 
+#displaycontent,
 .blog1 {
   display: flex;
   margin: 60px;

@@ -8,104 +8,42 @@ toggle_Btn.onclick = function () {
   toggle_BtnIcon.className = isOpen ? "fas fa-xmark" : "fas fa-bars";
 };
 
-function myfunc(event) {
-  event.preventDefault();
+document
+  .getElementById("blog-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+    var blog_name = document.getElementById("blog_name").value;
+    var message = document.getElementById("message").value;
+    var link_more = document.getElementById("link_more").value;
+    var link_image = document.getElementById("link_image").value;
+    var id = 0;
+    for (let i = 0; i < message.length; i++) {
+      id = id + 1;
+    }
 
-  var blog_name = document.getElementById("blog_name").value;
-  var message = document.getElementById("message").value;
-  var link_more = document.getElementById("link_more").value;
-  var link_image = document.getElementById("link_image").value;
+    var obj = { id, blog_name, message, link_image, link_more };
 
-  localStorage.setItem("ls_full_name", blog_name);
-  localStorage.setItem("ls_message", message);
-  localStorage.setItem("ls_link_more", link_more);
-  localStorage.setItem("ls_link_image", link_image);
-}
-document.getElementById("blog-form").addEventListener("submit", myfunc);
+    var mystorage = JSON.parse(localStorage.getItem("mystorage")) || [];
+    mystorage.push(obj);
+    localStorage.setItem("mystorage", JSON.stringify(mystorage));
 
-var selectedRow = null;
-function onFormSubmit() {
-  event.preventDefault();
-  var formData = readformData();
-  if (selectedRow === null) {
-    insertNewRecord(formData);
-  } else {
-    updateRecord(formData);
-  }
-  resetForm;
-}
+    alert("Form submitted and stored to local storage!");
+  });
 
-// retrieve the data
-function readformData() {
-  var formData = {};
-  formData["blog_name"] = document.getElementById("blog_name").value;
-  formData["message"] = document.getElementById("message").value;
-  formData["link_more"] = document.getElementById("link_more").value;
-  formData["link_image"] = document.getElementById("link_image").value;
-  return formData;
+// Retrieve the stored items array from local storage
+
+// Retrieve the stored items array from local storage
+var mystorage = JSON.parse(localStorage.getItem("mystorage")) || [];
+
+var hope = "";
+for (var i = 0; i < mystorage.length; i++) {
+  hope += `<h1>${mystorage[i].text}</h1> <a href="${mystorage[i].link}"> youtube</a> <img src="${mystorage.img}" alt="">`;
 }
 
-//Insert the data
-function insertNewRecord(data) {
-  // Check if the table header exists
-  if (!document.getElementById("storeList").tHead) {
-    // Create the table header row
-    var tableHeader = document.getElementById("storeList").createTHead();
-    var headerRow = tableHeader.insertRow(0);
-    headerRow.innerHTML =
-      "<th>Name of blog</th><th>Message</th><th>link to learn more</th><th>link of Thumnail</th>";
-  }
+// Display the stored items
+document.getElementById("hope").innerHTML = hope;
 
-  // Append rows to the table body
-  var tableBody = document.getElementById("storeList").tBodies[0];
-
-  // Append the new row to the table body
-  var newRow = tableBody.insertRow(tableBody.length);
-  var cell1 = newRow.insertCell(0);
-  cell1.innerHTML = data.blog_name;
-  var cell2 = newRow.insertCell(1);
-  cell2.innerHTML = data.message;
-  var cell3 = newRow.insertCell(2);
-  cell3.innerHTML = data.link_more;
-  var cell4 = newRow.insertCell(3);
-  cell4.innerHTML = data.link_image;
-  var cell5 = newRow.insertCell(4);
-  cell5.innerHTML = `<button onClick ='onEdit(this)'> Edit </button> <button onClick ='onDelete(this)'> Delete </button> `;
-}
-//edit the data
-function onEdit(td) {
-  selectedRow = td.parentElement.parentElement;
-  document.getElementById("blog_name").value = selectedRow.cells[0].innerHTML;
-  document.getElementById("message").value = selectedRow.cells[1].innerHTML;
-  document.getElementById("link_more").value = selectedRow.cells[2].innerHTML;
-  document.getElementById("link_image").value = selectedRow.cells[3].innerHTML;
-}
-
-function updateRecord(formData) {
-  selectedRow.cells[0].innerHTML = formData.blog_name;
-  selectedRow.cells[1].innerHTML = formData.message;
-  selectedRow.cells[2].innerHTML = formData.link_more;
-  selectedRow.cells[3].innerHTML = formData.link_image;
-}
-
-function onDelete(td) {
-  if (confirm("Do you want to delete this record?")) {
-    var row = td.parentElement.parentElement;
-    document.getElementById("storeList").deleteRow(row.rowIndex);
-  }
-}
-
-// rest form
-function resetForm() {
-  document.getElementById("blog_name").value = "";
-  document.getElementById("message").value = "";
-  document.getElementById("link_more").value = "";
-  document.getElementById("link_image").value = "";
-}
-
-document.getElementById("blog-form").addEventListener("submit", (e) => {
-  e.preventDefault(); // Prevent form submission
-
+function validForrm() {
   let blog_name = document.getElementById("blog_name").value;
   let message = document.getElementById("message").value;
   let link_more = document.getElementById("link_more").value;
@@ -115,45 +53,39 @@ document.getElementById("blog-form").addEventListener("submit", (e) => {
   let link1 = document.getElementById("link1");
   let link2 = document.getElementById("link2");
 
-  let message_name = [];
-  let message_message = [];
-  let message_link = [];
+  let isValid = true;
 
+  // Validation logic
   if (blog_name === "" || blog_name == null) {
-    message_name.push("Blog name is required");
-    name_error.innerHTML = message_name;
+    name_error.innerHTML = "Blog name is required";
+    isValid = false;
   } else {
     name_error.innerHTML = ""; // Clear error message if valid
   }
 
   if (message === "" || message == null) {
-    message_message.push("Message is required");
-    message_error.innerHTML = message_message;
+    message_error.innerHTML = "Message is required";
+    isValid = false;
   } else {
     message_error.innerHTML = ""; // Clear error message if valid
   }
 
   if (link_more === "" || link_more == null) {
-    message_link.push("Link for more information is required");
-    link1.innerHTML = message_link;
+    link1.innerHTML = "Link for more information is required";
+    isValid = false;
   } else {
     link1.innerHTML = ""; // Clear error message if valid
   }
 
   if (link_image === "" || link_image == null) {
-    message_link.push("Link for image is required");
-    link2.innerHTML = message_link;
+    link2.innerHTML = "Link for image is required";
+    isValid = false;
   } else {
     link2.innerHTML = ""; // Clear error message if valid
   }
 
   // If all fields are valid, proceed with inserting the record
-  if (
-    blog_name !== "" &&
-    message !== "" &&
-    link_more !== "" &&
-    link_image !== ""
-  ) {
+  if (isValid) {
     let formData = {
       blog_name: blog_name,
       message: message,
@@ -163,8 +95,59 @@ document.getElementById("blog-form").addEventListener("submit", (e) => {
 
     insertNewRecord(formData);
     resetForm();
+    alert("Form submitted and stored to local storage!");
   }
-});
+}
+
+// Variable to keep track of the number of records
+// Retrieve the stored items array from local storage
+
+function readAll() {
+  var tabledata = document.querySelector(".data_table");
+  var object = localStorage.getItem("mystorage");
+  var objectdata = JSON.parse(object);
+  var elements = "";
+  for (var i = 0; i < objectdata.length; i++) {
+    elements += `<tr>
+      <td>${objectdata[i].blog_name}</td>
+      <td>${objectdata[i].message}</td>
+      <td>${objectdata[i].link_more}</td>
+      <td>${objectdata[i].link_image}</td>
+      <td>
+        <button class="edit" onclick="edit(${objectdata[i].id})">Edit</button>
+        <button class="delete" onclick="deleteItem(${objectdata[i].id})">Delete</button>
+      </td>
+    </tr>`;
+  }
+
+  tabledata.innerHTML = elements;
+}
+
+function edit(id) {
+  // Retrieve the stored items array from local storage
+  var mystorage = JSON.parse(localStorage.getItem("mystorage")) || [];
+
+  // Find the record with the specified ID
+  var record = mystorage.find((record) => record.id === id);
+
+  // Pre-populate the form fields with the record's data
+  document.getElementById("blog_name").value = record.blog_name;
+  document.getElementById("message").value = record.message;
+  document.getElementById("link_more").value = record.link_more;
+  document.getElementById("link_image").value = record.link_image;
+
+  // Update the form's action attribute to point to the edit endpoint
+  document.getElementById("blog-form").action = `/edit/${id}`;
+}
+
+function deleteItem(id) {
+  var mystorage = JSON.parse(localStorage.getItem("mystorage")) || [];
+  mystorage = mystorage.filter(function (item) {
+    return item.id !== id;
+  });
+  localStorage.setItem("mystorage", JSON.stringify(mystorage));
+  readAll(); // refresh the table
+}
 
 // function insertNewRecord(data) {
 //   var table = document
@@ -181,7 +164,7 @@ document.getElementById("blog-form").addEventListener("submit", (e) => {
 //   cell4.innerHTML = data.link_image;
 //   var cell5 = newRow.insertCell(4);
 //   cell5.innerHTML = `<button onClick ='onEdit(this)'> Edit </button> <button onClick ='onDelete(this)'> Delete </button> `;
-// }
+//}
 
 // ---------------------------------------------
 

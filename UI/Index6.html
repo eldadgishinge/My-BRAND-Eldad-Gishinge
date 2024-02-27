@@ -95,7 +95,7 @@
               >
                 <h3 style="color: orange"><b>Comment</b></h3>
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name"  />
+                <!-- <input type="text" id="name" name="name"  /> --><h4 id="name"></h4>
                 <div id="error1" style="color: red; font-size:small;"></div>
 
                 <label for="comment">Comment:</label>
@@ -110,7 +110,7 @@
                 <input type="file" id="image" name="image" /> -->
 
                 <br />
-                <input type="submit" value="Submit" s />
+                <input type="submit" value="Submit" />
               </form>
             </div>
             <div class="comment-display">
@@ -225,7 +225,7 @@
     event.preventDefault(); // Prevent form submission
 
     // Get user input
-    const name = document.getElementById('name').value;
+    const name = localStorage.getItem("username")
     const comment = document.getElementById('comment').value;
     const error1 = document.getElementById('error1');
     const error = document.getElementById('error');
@@ -269,7 +269,11 @@
   });
 });
 
+ var username = localStorage.getItem("username");
 
+      if (username) {
+        document.getElementById("name").innerHTML = username;
+      };
     </script>
 
   </body>
