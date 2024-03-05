@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 var express = require("express");
+var Joi = require("joi");
 var app = express();
 var mongoose = require("mongoose");
 var Comments = require("./models/commentModels");
@@ -49,17 +50,68 @@ var verifyAccessToken = require("./auth").verifyAccessToken;
 var generateAccessToken = require("./auth").generateAccessToken;
 var _a = require("./auth"), generateAccessToken = _a.generateAccessToken, generateRefreshToken = _a.generateRefreshToken, verifyAccessToken = _a.verifyAccessToken;
 require("dotenv").config();
+// Joi schema for blog creation
+var blogSchema = Joi.object({
+    blog_name: Joi.string().required(),
+    blog_image: Joi.string().required(),
+    blog_description: Joi.string().required(),
+    blog_content: Joi.string().required(),
+});
+// Middleware function to validate blog creation request
+var validateBlog = function (req, res, next) {
+    var error = blogSchema.validate(req.body).error;
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+    next();
+};
+// comment joi validation
+var commentSchema = Joi.object({
+    blog_id: Joi.string().required(),
+    commenter_name: Joi.string().required(),
+    comment: Joi.string().required(),
+});
+// Define login schema
+var loginSchema = Joi.object({
+    user_name: Joi.string().required(),
+    user_password: Joi.string().required(),
+});
+// Define signup schema
+var signupSchema = Joi.object({
+    user_name: Joi.string().required(),
+    user_password: Joi.string().required(),
+});
+//contact us validation
+var contactValidationSchema = Joi.object({
+    Contact_name: Joi.string().required().messages({
+        "any.required": "Please enter the contact name",
+        "string.empty": "Please enter the contact name",
+    }),
+    contact_email: Joi.string().email().required().messages({
+        "any.required": "Please enter the contact email",
+        "string.empty": "Please enter the contact email",
+        "string.email": "Please enter a valid email address",
+    }),
+    contact_message: Joi.string().required().messages({
+        "any.required": "Please enter the contact message",
+        "string.empty": "Please enter the contact message",
+    }),
+});
 //routes
 app.get("/", function (req, res) {
     res.send("Hello Eldad API");
 });
 // -----------------------------------COMMENTS-------------------------------------------------------------
 app.post("/Comments", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var blog_id, comment, error_1;
+    var error, blog_id, comment, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 3, , 4]);
+                error = commentSchema.validate(req.body).error;
+                if (error) {
+                    return [2 /*return*/, res.status(400).json({ error: error.details[0].message })];
+                }
                 blog_id = req.body.blog_id;
                 return [4 /*yield*/, Comments.create(req.body)];
             case 1:
@@ -139,7 +191,7 @@ app.delete("/Comments/:id", function (req, res) { return __awaiter(_this, void 0
     });
 }); });
 // -----------------------------------Blogs-------------------------------------------------------------
-app.post("/Blog", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+app.post("/Blog", validateBlog, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var blog, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -254,18 +306,22 @@ app.delete("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, vo
 }); });
 // -----------------------------------CONTACT -------------------------------------------------------------
 app.post("/Contact", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var contact, error_10;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var _a, error, value, contact, error_10;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, Contact.create(req.body)];
+                _b.trys.push([0, 2, , 3]);
+                _a = contactValidationSchema.validate(req.body), error = _a.error, value = _a.value;
+                if (error) {
+                    return [2 /*return*/, res.status(400).json({ error: error.details[0].message })];
+                }
+                return [4 /*yield*/, Contact.create(value)];
             case 1:
-                contact = _a.sent();
+                contact = _b.sent();
                 res.status(200).json({ contact: contact });
                 return [3 /*break*/, 3];
             case 2:
-                error_10 = _a.sent();
+                error_10 = _b.sent();
                 console.log(error_10.message);
                 res.status(500).json({ message: "No Contact Server Error" });
                 return [3 /*break*/, 3];
@@ -367,33 +423,37 @@ app.delete("/Contact/:id", function (req, res) { return __awaiter(_this, void 0,
     });
 }); });
 // -----------------------------------Signup and login -------------------------------------------------------------
-// Sign Up Route
+// Sign Up Route with Joi validation
 app.post("/signup", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var _a, user_name, user_password, existingUser, hashedPassword, newUser, error_15;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var _a, error, value, _b, user_name, user_password, existingUser, hashedPassword, newUser, error_15;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
-                _a = req.body, user_name = _a.user_name, user_password = _a.user_password;
+                _c.trys.push([0, 4, , 5]);
+                _a = signupSchema.validate(req.body), error = _a.error, value = _a.value;
+                if (error) {
+                    return [2 /*return*/, res.status(400).json({ message: error.details[0].message })];
+                }
+                _b = req.body, user_name = _b.user_name, user_password = _b.user_password;
                 return [4 /*yield*/, Login.findOne({ user_name: user_name })];
             case 1:
-                existingUser = _b.sent();
+                existingUser = _c.sent();
                 if (existingUser) {
                     return [2 /*return*/, res.status(400).json({ message: "User already exists" })];
                 }
                 return [4 /*yield*/, bcrypt.hash(user_password, 10)];
             case 2:
-                hashedPassword = _b.sent();
+                hashedPassword = _c.sent();
                 return [4 /*yield*/, Login.create({
                         user_name: user_name,
                         user_password: hashedPassword, // Store only the hashed password in the database
                     })];
             case 3:
-                newUser = _b.sent();
+                newUser = _c.sent();
                 res.status(201).json({ message: "User created successfully" });
                 return [3 /*break*/, 5];
             case 4:
-                error_15 = _b.sent();
+                error_15 = _c.sent();
                 console.error(error_15);
                 res.status(500).json({ message: "Server Error" });
                 return [3 /*break*/, 5];
@@ -401,24 +461,27 @@ app.post("/signup", function (req, res) { return __awaiter(_this, void 0, void 0
         }
     });
 }); });
-// Login Route
-// Login Route
+// Login Route with Joi validation
 app.post("/login", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var _a, user_name, user_password, user, passwordMatch, accessToken, refreshToken, error_16;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var _a, error, value, _b, user_name, user_password, user, passwordMatch, accessToken, refreshToken, error_16;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
-                _a = req.body, user_name = _a.user_name, user_password = _a.user_password;
+                _c.trys.push([0, 4, , 5]);
+                _a = loginSchema.validate(req.body), error = _a.error, value = _a.value;
+                if (error) {
+                    return [2 /*return*/, res.status(400).json({ message: error.details[0].message })];
+                }
+                _b = req.body, user_name = _b.user_name, user_password = _b.user_password;
                 return [4 /*yield*/, Login.findOne({ user_name: user_name }).select("+user_password")];
             case 1:
-                user = _b.sent();
+                user = _c.sent();
                 if (!user) {
                     return [2 /*return*/, res.status(400).json({ message: "Invalid credentials" })];
                 }
                 return [4 /*yield*/, bcrypt.compare(user_password, user.user_password)];
             case 2:
-                passwordMatch = _b.sent();
+                passwordMatch = _c.sent();
                 if (!passwordMatch) {
                     return [2 /*return*/, res.status(400).json({ message: "Invalid credentials" })];
                 }
@@ -428,11 +491,11 @@ app.post("/login", function (req, res) { return __awaiter(_this, void 0, void 0,
                 user.refreshToken = refreshToken;
                 return [4 /*yield*/, user.save()];
             case 3:
-                _b.sent();
+                _c.sent();
                 res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken });
                 return [3 /*break*/, 5];
             case 4:
-                error_16 = _b.sent();
+                error_16 = _c.sent();
                 console.error(error_16);
                 res.status(500).json({ message: "Server Error" });
                 return [3 /*break*/, 5];

@@ -1,4 +1,5 @@
 const express = require("express");
+const Joi = require("joi");
 const app = express();
 const mongoose = require("mongoose");
 const Comments = require("./models/commentModels");
@@ -18,6 +19,60 @@ const {
 
 require("dotenv").config();
 
+// Joi schema for blog creation
+const blogSchema = Joi.object({
+  blog_name: Joi.string().required(),
+  blog_image: Joi.string().required(),
+  blog_description: Joi.string().required(),
+  blog_content: Joi.string().required(),
+});
+
+// Middleware function to validate blog creation request
+const validateBlog = (req, res, next) => {
+  const { error } = blogSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+  next();
+};
+
+// comment joi validation
+
+const commentSchema = Joi.object({
+  blog_id: Joi.string().required(),
+  commenter_name: Joi.string().required(),
+  comment: Joi.string().required(),
+});
+// Define login schema
+const loginSchema = Joi.object({
+  user_name: Joi.string().required(),
+  user_password: Joi.string().required(),
+});
+
+// Define signup schema
+const signupSchema = Joi.object({
+  user_name: Joi.string().required(),
+  user_password: Joi.string().required(),
+});
+
+//contact us validation
+
+const contactValidationSchema = Joi.object({
+  Contact_name: Joi.string().required().messages({
+    "any.required": "Please enter the contact name",
+    "string.empty": "Please enter the contact name",
+  }),
+  contact_email: Joi.string().email().required().messages({
+    "any.required": "Please enter the contact email",
+    "string.empty": "Please enter the contact email",
+    "string.email": "Please enter a valid email address",
+  }),
+  contact_message: Joi.string().required().messages({
+    "any.required": "Please enter the contact message",
+    "string.empty": "Please enter the contact message",
+  }),
+});
+
 //routes
 
 app.get("/", (req, res) => {
@@ -27,6 +82,11 @@ app.get("/", (req, res) => {
 
 app.post("/Comments", async (req, res) => {
   try {
+    const { error } = commentSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
     const { blog_id } = req.body;
     const comment = await Comments.create(req.body);
     await Blog.findByIdAndUpdate(blog_id, { $push: { comments: comment._id } });
@@ -36,6 +96,7 @@ app.post("/Comments", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
 app.get("/Comments", async (req, res) => {
   try {
     const comments = await Comments.find();
@@ -67,7 +128,7 @@ app.delete("/Comments/:id", async (req, res) => {
 
 // -----------------------------------Blogs-------------------------------------------------------------
 
-app.post("/Blog", async (req, res) => {
+app.post("/Blog", validateBlog, async (req, res) => {
   try {
     const blog = await Blog.create(req.body); // Use Comments.create directly
     res.status(200).json({ blog });
@@ -132,13 +193,21 @@ app.delete("/Blog/:id", async (req, res) => {
 
 app.post("/Contact", async (req, res) => {
   try {
-    const contact = await Contact.create(req.body); // Use Comments.create directly
+    // Validate request body
+    const { error, value } = contactValidationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    // If validation passes, proceed with creating the contact
+    const contact = await Contact.create(value);
     res.status(200).json({ contact });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "No Contact Server Error" });
   }
 });
+
 // edit contact
 app.put("/Contact/:id", async (req, res) => {
   try {
@@ -190,9 +259,16 @@ app.delete("/Contact/:id", async (req, res) => {
   }
 });
 // -----------------------------------Signup and login -------------------------------------------------------------
-// Sign Up Route
+// Sign Up Route with Joi validation
 app.post("/signup", async (req, res) => {
   try {
+    // Validate request body against signup schema
+    const { error, value } = signupSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { user_name, user_password } = req.body;
 
     // Check if the user already exists
@@ -218,10 +294,16 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// Login Route
-// Login Route
+// Login Route with Joi validation
 app.post("/login", async (req, res) => {
   try {
+    // Validate request body against login schema
+    const { error, value } = loginSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { user_name, user_password } = req.body;
 
     // Find the user by username and include the password field
