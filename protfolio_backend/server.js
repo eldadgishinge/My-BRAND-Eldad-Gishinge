@@ -49,7 +49,24 @@ process.env.ACCESS_TOKEN_SECRET = "your-secret-key";
 var verifyAccessToken = require("./auth").verifyAccessToken;
 var generateAccessToken = require("./auth").generateAccessToken;
 var _a = require("./auth"), generateAccessToken = _a.generateAccessToken, generateRefreshToken = _a.generateRefreshToken, verifyAccessToken = _a.verifyAccessToken;
+var swaggerJsDoc = require("swagger-jsdoc");
+var swaggerUi = require("swagger-ui-express");
 require("dotenv").config();
+var options = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Eldad's portflio Brand for mongoDB",
+            version: "1.0.0",
+        },
+        servers: [{
+                url: "http://localhost:4000/",
+            }]
+    },
+    apis: ["./server.js"],
+};
+var swaggerSpec = swaggerJsDoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Joi schema for blog creation
 var blogSchema = Joi.object({
     blog_name: Joi.string().required(),
@@ -102,6 +119,30 @@ app.get("/", function (req, res) {
     res.send("Hello Eldad API");
 });
 // -----------------------------------COMMENTS-------------------------------------------------------------
+/**
+ * @swagger
+ * /Comments:
+ *   post:
+ *     summary: Create a new comment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blog_id:
+ *                 type: string
+ *               commenter_name:
+ *                 type: string
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully created comment
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ */
 app.post("/Comments", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var error, blog_id, comment, error_1;
     return __generator(this, function (_a) {
@@ -130,6 +171,17 @@ app.post("/Comments", function (req, res) { return __awaiter(_this, void 0, void
         }
     });
 }); });
+/**
+ * @swagger
+ * /Comments:
+ *   get:
+ *     summary: Get all comments
+ *     responses:
+ *       '200':
+ *         description: A list of comments
+ *       '500':
+ *         description: Internal server error
+ */
 app.get("/Comments", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var comments, error_2;
     return __generator(this, function (_a) {
@@ -150,6 +202,23 @@ app.get("/Comments", function (req, res) { return __awaiter(_this, void 0, void 
         }
     });
 }); });
+/**
+ * @swagger
+ * /Comments/{id}:
+ *   get:
+ *     summary: Get a comment by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A comment object
+ *       '500':
+ *         description: Internal server error
+ */
 app.get("/Comments/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, comments, error_3;
     return __generator(this, function (_a) {
@@ -170,6 +239,23 @@ app.get("/Comments/:id", function (req, res) { return __awaiter(_this, void 0, v
         }
     });
 }); });
+/**
+ * @swagger
+ * /Comments/{id}:
+ *   delete:
+ *     summary: Delete a comment by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted comment
+ *       '500':
+ *         description: Internal server error
+ */
 app.delete("/Comments/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, comments, error_4;
     return __generator(this, function (_a) {
@@ -191,6 +277,34 @@ app.delete("/Comments/:id", function (req, res) { return __awaiter(_this, void 0
     });
 }); });
 // -----------------------------------Blogs-------------------------------------------------------------
+/**
+ * @swagger
+ * /Blog:
+ *   post:
+ *     summary: Create a new blog
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blog_name:
+ *                 type: string
+ *               blog_image:
+ *                 type: string
+ *               blog_description:
+ *                 type: string
+ *               blog_content:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully created blog
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
 app.post("/Blog", validateBlog, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var blog, error_5;
     return __generator(this, function (_a) {
@@ -211,6 +325,23 @@ app.post("/Blog", validateBlog, function (req, res) { return __awaiter(_this, vo
         }
     });
 }); });
+/**
+ * @swagger
+ * /Blog/{id}:
+ *   get:
+ *     summary: Get a blog by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A blog object
+ *       '500':
+ *         description: Internal server error
+ */
 //find blog by id
 app.get("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, blog, error_6;
@@ -232,6 +363,17 @@ app.get("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, void 
         }
     });
 }); });
+/**
+ * @swagger
+ * /Blog:
+ *   get:
+ *     summary: Get all blogs
+ *     responses:
+ *       '200':
+ *         description: A list of blogs
+ *       '500':
+ *         description: Internal server error
+ */
 //get all blogs
 app.get("/Blog", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var blogs, error_7;
@@ -253,6 +395,42 @@ app.get("/Blog", function (req, res) { return __awaiter(_this, void 0, void 0, f
         }
     });
 }); });
+/**
+ * @swagger
+ * /Blog/{id}:
+ *   put:
+ *     summary: Update a blog by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blog_name:
+ *                 type: string
+ *               blog_image:
+ *                 type: string
+ *               blog_description:
+ *                 type: string
+ *               blog_content:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully updated blog
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: Blog not found
+ *       '500':
+ *         description: Internal server error
+ */
 //update blog
 app.put("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, blog, updatedblog, error_8;
@@ -283,6 +461,23 @@ app.put("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, void 
         }
     });
 }); });
+/**
+ * @swagger
+ * /Blog/{id}:
+ *   delete:
+ *     summary: Delete a blog by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted blog
+ *       '500':
+ *         description: Internal server error
+ */
 //delete blog
 app.delete("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, blog, error_9;
@@ -305,6 +500,32 @@ app.delete("/Blog/:id", function (req, res) { return __awaiter(_this, void 0, vo
     });
 }); });
 // -----------------------------------CONTACT -------------------------------------------------------------
+/**
+ * @swagger
+ * /Contact:
+ *   post:
+ *     summary: Create a new contact message
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Contact_name:
+ *                 type: string
+ *               contact_email:
+ *                 type: string
+ *               contact_message:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully created contact message
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
 app.post("/Contact", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var _a, error, value, contact, error_10;
     return __generator(this, function (_b) {
@@ -329,6 +550,40 @@ app.post("/Contact", function (req, res) { return __awaiter(_this, void 0, void 
         }
     });
 }); });
+/**
+ * @swagger
+ * /Contact/{id}:
+ *   put:
+ *     summary: Update a contact message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Contact_name:
+ *                 type: string
+ *               contact_email:
+ *                 type: string
+ *               contact_message:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully updated contact message
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: Contact message not found
+ *       '500':
+ *         description: Internal server error
+ */
 // edit contact
 app.put("/Contact/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, contact, updatedcontact, error_11;
@@ -359,6 +614,17 @@ app.put("/Contact/:id", function (req, res) { return __awaiter(_this, void 0, vo
         }
     });
 }); });
+/**
+ * @swagger
+ * /Contact:
+ *   get:
+ *     summary: Get all contact messages
+ *     responses:
+ *       '200':
+ *         description: A list of contact messages
+ *       '500':
+ *         description: Internal server error
+ */
 // get all contacts
 app.get("/Contact", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var contacts, error_12;
@@ -380,6 +646,23 @@ app.get("/Contact", function (req, res) { return __awaiter(_this, void 0, void 0
         }
     });
 }); });
+/**
+ * @swagger
+ * /Contact/{id}:
+ *   get:
+ *     summary: Get a contact message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A contact message object
+ *       '500':
+ *         description: Internal server error
+ */
 //find contact by id
 app.get("/Contact/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, contact, error_13;
@@ -401,6 +684,23 @@ app.get("/Contact/:id", function (req, res) { return __awaiter(_this, void 0, vo
         }
     });
 }); });
+/**
+ * @swagger
+ * /Contact/{id}:
+ *   delete:
+ *     summary: Delete a contact message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted contact message
+ *       '500':
+ *         description: Internal server error
+ */
 //delete contact
 app.delete("/Contact/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, contact, error_14;
@@ -424,6 +724,30 @@ app.delete("/Contact/:id", function (req, res) { return __awaiter(_this, void 0,
 }); });
 // -----------------------------------Signup and login -------------------------------------------------------------
 // Sign Up Route with Joi validation
+/**
+ * @swagger
+ * /signup:
+ *   post:
+ *     summary: Create a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_name:
+ *                 type: string
+ *               user_password:
+ *                 type: string
+ *     responses:
+ *       '201':
+ *         description: User created successfully
+ *       '400':
+ *         description: Bad request. Invalid input data or user already exists.
+ *       '500':
+ *         description: Internal server error
+ */
 app.post("/signup", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var _a, error, value, _b, user_name, user_password, existingUser, hashedPassword, newUser, error_15;
     return __generator(this, function (_c) {
@@ -461,6 +785,30 @@ app.post("/signup", function (req, res) { return __awaiter(_this, void 0, void 0
         }
     });
 }); });
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Authenticate user and generate tokens
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_name:
+ *                 type: string
+ *               user_password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Authentication successful. Access and refresh tokens generated.
+ *       '400':
+ *         description: Bad request. Invalid credentials.
+ *       '500':
+ *         description: Internal server error
+ */
 // Login Route with Joi validation
 app.post("/login", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var _a, error, value, _b, user_name, user_password, user, passwordMatch, accessToken, refreshToken, error_16;
@@ -503,6 +851,17 @@ app.post("/login", function (req, res) { return __awaiter(_this, void 0, void 0,
         }
     });
 }); });
+/**
+ * @swagger
+ * /Login:
+ *   get:
+ *     summary: Get all users
+ *     responses:
+ *       '200':
+ *         description: A list of users
+ *       '500':
+ *         description: Internal server error
+ */
 //get all users
 app.get("/Login", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var users, error_17;
@@ -524,6 +883,23 @@ app.get("/Login", function (req, res) { return __awaiter(_this, void 0, void 0, 
         }
     });
 }); });
+/**
+ * @swagger
+ * /Login/{id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted user
+ *       '500':
+ *         description: Internal server error
+ */
 //delete user by id
 app.delete("/Login/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, user, error_18;
@@ -545,6 +921,23 @@ app.delete("/Login/:id", function (req, res) { return __awaiter(_this, void 0, v
         }
     });
 }); });
+/**
+ * @swagger
+ * /Login/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A user object
+ *       '500':
+ *         description: Internal server error
+ */
 //get user by id
 app.get("/Login/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, user, error_19;
@@ -566,7 +959,36 @@ app.get("/Login/:id", function (req, res) { return __awaiter(_this, void 0, void
         }
     });
 }); });
-//update user by id
+/**
+ * @swagger
+ * /Login/{id}:
+ *   put:
+ *     summary: Update a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully updated user
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
 // Update user by id
 app.put("/Login/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, user_password, hashedPassword, user, error_20;
@@ -600,6 +1022,34 @@ app.put("/Login/:id", function (req, res) { return __awaiter(_this, void 0, void
     });
 }); });
 // --------------------------------------likes-------------------------------------------------------------
+/**
+ * @swagger
+ * /Blog/like/{id}:
+ *   put:
+ *     summary: Like a blog
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: userId
+ *         description: User ID
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             userId:
+ *               type: string
+ *     responses:
+ *       '200':
+ *         description: Blog liked successfully
+ *       '400':
+ *         description: User has already liked this blog or invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
 app.put("/Blog/like/:id", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var id, userId, blog, updatedBlog, error_21;
     return __generator(this, function (_a) {

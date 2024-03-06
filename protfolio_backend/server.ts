@@ -17,7 +17,28 @@ const {
   verifyAccessToken,
 } = require("./auth");
 
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
 require("dotenv").config();
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info:{
+      title : "Eldad's portflio Brand for mongoDB",
+      version: "1.0.0",
+    }
+    servers : [{
+      url: "http://localhost:4000/",
+    }]
+  }
+  apis: ["./server.js"],
+}
+
+const swaggerSpec = swaggerJsDoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 // Joi schema for blog creation
 const blogSchema = Joi.object({
@@ -79,6 +100,31 @@ app.get("/", (req, res) => {
   res.send("Hello Eldad API");
 });
 // -----------------------------------COMMENTS-------------------------------------------------------------
+/**
+ * @swagger
+ * /Comments:
+ *   post:
+ *     summary: Create a new comment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blog_id:
+ *                 type: string
+ *               commenter_name:
+ *                 type: string
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully created comment
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ */
+
 
 app.post("/Comments", async (req, res) => {
   try {
@@ -97,6 +143,18 @@ app.post("/Comments", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /Comments:
+ *   get:
+ *     summary: Get all comments
+ *     responses:
+ *       '200':
+ *         description: A list of comments
+ *       '500':
+ *         description: Internal server error
+ */
+
 app.get("/Comments", async (req, res) => {
   try {
     const comments = await Comments.find();
@@ -106,6 +164,23 @@ app.get("/Comments", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+/**
+ * @swagger
+ * /Comments/{id}:
+ *   get:
+ *     summary: Get a comment by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A comment object
+ *       '500':
+ *         description: Internal server error
+ */
 
 app.get("/Comments/:id", async (req, res) => {
   try {
@@ -116,6 +191,24 @@ app.get("/Comments/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+/**
+ * @swagger
+ * /Comments/{id}:
+ *   delete:
+ *     summary: Delete a comment by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted comment
+ *       '500':
+ *         description: Internal server error
+ */
 app.delete("/Comments/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -127,7 +220,34 @@ app.delete("/Comments/:id", async (req, res) => {
 });
 
 // -----------------------------------Blogs-------------------------------------------------------------
-
+/**
+ * @swagger
+ * /Blog:
+ *   post:
+ *     summary: Create a new blog
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blog_name:
+ *                 type: string
+ *               blog_image:
+ *                 type: string
+ *               blog_description:
+ *                 type: string
+ *               blog_content:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully created blog
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
 app.post("/Blog", validateBlog, async (req, res) => {
   try {
     const blog = await Blog.create(req.body); // Use Comments.create directly
@@ -137,7 +257,23 @@ app.post("/Blog", validateBlog, async (req, res) => {
     res.status(500).json({ message: "No blog Server Error" });
   }
 });
-
+/**
+ * @swagger
+ * /Blog/{id}:
+ *   get:
+ *     summary: Get a blog by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A blog object
+ *       '500':
+ *         description: Internal server error
+ */
 //find blog by id
 app.get("/Blog/:id", async (req, res) => {
   try {
@@ -149,6 +285,17 @@ app.get("/Blog/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /Blog:
+ *   get:
+ *     summary: Get all blogs
+ *     responses:
+ *       '200':
+ *         description: A list of blogs
+ *       '500':
+ *         description: Internal server error
+ */
 //get all blogs
 app.get("/Blog", async (req, res) => {
   try {
@@ -160,6 +307,43 @@ app.get("/Blog", async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /Blog/{id}:
+ *   put:
+ *     summary: Update a blog by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blog_name:
+ *                 type: string
+ *               blog_image:
+ *                 type: string
+ *               blog_description:
+ *                 type: string
+ *               blog_content:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully updated blog
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: Blog not found
+ *       '500':
+ *         description: Internal server error
+ */
 //update blog
 app.put("/Blog/:id", async (req, res) => {
   try {
@@ -177,7 +361,23 @@ app.put("/Blog/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
+/**
+ * @swagger
+ * /Blog/{id}:
+ *   delete:
+ *     summary: Delete a blog by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted blog
+ *       '500':
+ *         description: Internal server error
+ */
 //delete blog
 app.delete("/Blog/:id", async (req, res) => {
   try {
@@ -190,7 +390,32 @@ app.delete("/Blog/:id", async (req, res) => {
 });
 
 // -----------------------------------CONTACT -------------------------------------------------------------
-
+/**
+ * @swagger
+ * /Contact:
+ *   post:
+ *     summary: Create a new contact message
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Contact_name:
+ *                 type: string
+ *               contact_email:
+ *                 type: string
+ *               contact_message:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully created contact message
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
 app.post("/Contact", async (req, res) => {
   try {
     // Validate request body
@@ -207,7 +432,40 @@ app.post("/Contact", async (req, res) => {
     res.status(500).json({ message: "No Contact Server Error" });
   }
 });
-
+/**
+ * @swagger
+ * /Contact/{id}:
+ *   put:
+ *     summary: Update a contact message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Contact_name:
+ *                 type: string
+ *               contact_email:
+ *                 type: string
+ *               contact_message:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully updated contact message
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: Contact message not found
+ *       '500':
+ *         description: Internal server error
+ */
 // edit contact
 app.put("/Contact/:id", async (req, res) => {
   try {
@@ -225,7 +483,17 @@ app.put("/Contact/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
+/**
+ * @swagger
+ * /Contact:
+ *   get:
+ *     summary: Get all contact messages
+ *     responses:
+ *       '200':
+ *         description: A list of contact messages
+ *       '500':
+ *         description: Internal server error
+ */
 // get all contacts
 app.get("/Contact", async (req, res) => {
   try {
@@ -236,6 +504,23 @@ app.get("/Contact", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+/**
+ * @swagger
+ * /Contact/{id}:
+ *   get:
+ *     summary: Get a contact message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A contact message object
+ *       '500':
+ *         description: Internal server error
+ */
 
 //find contact by id
 app.get("/Contact/:id", async (req, res) => {
@@ -247,7 +532,23 @@ app.get("/Contact/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
+/**
+ * @swagger
+ * /Contact/{id}:
+ *   delete:
+ *     summary: Delete a contact message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted contact message
+ *       '500':
+ *         description: Internal server error
+ */
 //delete contact
 app.delete("/Contact/:id", async (req, res) => {
   try {
@@ -260,6 +561,30 @@ app.delete("/Contact/:id", async (req, res) => {
 });
 // -----------------------------------Signup and login -------------------------------------------------------------
 // Sign Up Route with Joi validation
+/**
+ * @swagger
+ * /signup:
+ *   post:
+ *     summary: Create a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_name:
+ *                 type: string
+ *               user_password:
+ *                 type: string
+ *     responses:
+ *       '201':
+ *         description: User created successfully
+ *       '400':
+ *         description: Bad request. Invalid input data or user already exists.
+ *       '500':
+ *         description: Internal server error
+ */
 app.post("/signup", async (req, res) => {
   try {
     // Validate request body against signup schema
@@ -293,6 +618,30 @@ app.post("/signup", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Authenticate user and generate tokens
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_name:
+ *                 type: string
+ *               user_password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Authentication successful. Access and refresh tokens generated.
+ *       '400':
+ *         description: Bad request. Invalid credentials.
+ *       '500':
+ *         description: Internal server error
+ */
 
 // Login Route with Joi validation
 app.post("/login", async (req, res) => {
@@ -337,7 +686,17 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
+/**
+ * @swagger
+ * /Login:
+ *   get:
+ *     summary: Get all users
+ *     responses:
+ *       '200':
+ *         description: A list of users
+ *       '500':
+ *         description: Internal server error
+ */
 //get all users
 app.get("/Login", async (req, res) => {
   try {
@@ -348,7 +707,23 @@ app.get("/Login", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
+/**
+ * @swagger
+ * /Login/{id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted user
+ *       '500':
+ *         description: Internal server error
+ */
 //delete user by id
 app.delete("/Login/:id", async (req, res) => {
   try {
@@ -359,6 +734,24 @@ app.delete("/Login/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+/**
+ * @swagger
+ * /Login/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A user object
+ *       '500':
+ *         description: Internal server error
+ */
 
 //get user by id
 app.get("/Login/:id", async (req, res) => {
@@ -371,7 +764,36 @@ app.get("/Login/:id", async (req, res) => {
   }
 });
 
-//update user by id
+/**
+ * @swagger
+ * /Login/{id}:
+ *   put:
+ *     summary: Update a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully updated user
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
 // Update user by id
 app.put("/Login/:id", async (req, res) => {
   try {
@@ -403,6 +825,34 @@ app.put("/Login/:id", async (req, res) => {
 
 // --------------------------------------likes-------------------------------------------------------------
 
+/**
+ * @swagger
+ * /Blog/like/{id}:
+ *   put:
+ *     summary: Like a blog
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: userId
+ *         description: User ID
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             userId:
+ *               type: string
+ *     responses:
+ *       '200':
+ *         description: Blog liked successfully
+ *       '400':
+ *         description: User has already liked this blog or invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
 app.put("/Blog/like/:id", async (req, res) => {
   try {
     const { id } = req.params;
